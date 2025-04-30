@@ -8,31 +8,37 @@ const welcome = {
   title: "React",
 };
 
-const list = [ 
-  {
-    title: "React",
-    url: "https://reactjs.org/",
-    author: "Jordan Walke",
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: "Redux",
-    url: "https://redux.js.org/",
-    author: "Dan Abramov, Andrew Clark",
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-];
+const App = () => {
+  const [count, setCount] = useState(0)
+  const [searchTerm, setSearchTerm] = useState("")
 
-function getTitle(title) {
-  return title;
-}
+  const list = [ 
+    {
+      title: "React",
+      url: "https://reactjs.org/",
+      author: "Jordan Walke",
+      num_comments: 3,
+      points: 4,
+      objectID: 0,
+    },
+    {
+      title: "Redux",
+      url: "https://redux.js.org/",
+      author: "Dan Abramov, Andrew Clark",
+      num_comments: 2,
+      points: 5,
+      objectID: 1,
+    },
+  ]
 
-function App() {
-  const [count, setCount] = useState(0);
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value)
+    console.log("Search Term:", event.target.value)
+  }
+
+  const filteredList = list.filter((item) =>
+    item.title.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <>
@@ -61,37 +67,37 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
 
-      <Search />
-      <Lista />
+      <Search searchTerm={searchTerm} onSearch={handleSearch} />
+      <Lista list={filteredList} />
     </>
-  );
+  )
 }
 
-function Search() {
+const Search = ({ searchTerm, onSearch }) => {
   return (
     <div>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" />
+      <input
+        id="search"
+        type="text"
+        value={searchTerm}
+        onChange={onSearch}
+      />
     </div>
-  );
+  )
 }
 
-function Lista() {
-  return (
-    <div>
-      <p>This is my list:</p>
-      <ul>
-        {list.map((item) => (
-          <li key={item.objectID}>
-            <a href={item.url}>{item.title}</a> — the author is {item.author}, comments: {item.num_comments}, points: {item.points}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+const Lista = ({ list }) => (
+  <div>
+    <p>This is my list:</p>
+    <ul>
+      {list.map((item) => (
+        <li key={item.objectID}>
+          <a href={item.url}>{item.title}</a> — the author is {item.author}, comments: {item.num_comments}, points: {item.points}
+        </li>
+      ))}
+    </ul>
+  </div>
+)
 
-  
-
-
-export default App;
+export default App
