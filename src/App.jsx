@@ -32,6 +32,10 @@ const App = () => {
     console.log("Search Term:", event.target.value)
   }
 
+  const filteredStories = stories.filter((story) =>
+    story.title.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <>
       <div>
@@ -54,7 +58,7 @@ const App = () => {
 
       <Search searchTerm={searchTerm} onSearch={handleSearch} />
       <p>Searching for: {searchTerm}</p>
-      <List list={stories} />
+      <List list={filteredStories} />
     </>
   )
 }
