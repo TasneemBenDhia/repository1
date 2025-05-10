@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -6,7 +6,7 @@ import './App.css'
 const App = () => {
   console.log("App renders")
 
-  const stories = [ 
+  const stories = [
     {
       title: "React",
       url: "https://reactjs.org/",
@@ -25,12 +25,19 @@ const App = () => {
     },
   ]
 
-  const [searchTerm, setSearchTerm] = useState("")
+  const getStoredSearchTerm = () =>
+    localStorage.getItem('search') || ''
+
+  const [searchTerm, setSearchTerm] = useState(getStoredSearchTerm)
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value)
     console.log("Search Term:", event.target.value)
   }
+
+  useEffect(() => {
+    localStorage.setItem('search', searchTerm)
+  }, [searchTerm])
 
   const filteredStories = stories.filter((story) =>
     story.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -67,7 +74,7 @@ const Search = ({ searchTerm, onSearch }) => {
   console.log("Search renders")
 
   return (
-    <div>
+    <form onSubmit={(e) => e.preventDefault()}>
       <label htmlFor="search">Search: </label>
       <input
         id="search"
@@ -75,7 +82,7 @@ const Search = ({ searchTerm, onSearch }) => {
         value={searchTerm}
         onChange={onSearch}
       />
-    </div>
+    </form>
   )
 }
 
@@ -86,8 +93,8 @@ const List = ({ list }) => {
     <div>
       <p>This is my list:</p>
       <ul>
-        {list.map((item) => (
-          <Item key={item.objectID} item={item} />
+        {list.map(({ objectID, ...item }) => (
+          <Item key={objectID} item={item} />
         ))}
       </ul>
     </div>
@@ -96,10 +103,11 @@ const List = ({ list }) => {
 
 const Item = ({ item }) => {
   console.log("Item renders")
+  const { title, url, author, num_comments, points } = item
 
   return (
     <li>
-      <a href={item.url}>{item.title}</a> — the author is {item.author}, comments: {item.num_comments}, points: {item.points}
+      <a href={url}>{title}</a> — the author is {author}, comments: {num_comments}, points: {points}
     </li>
   )
 }
