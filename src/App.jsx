@@ -1,115 +1,95 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+
+const List = ({ list, onRemoveItem }) => (
+  <ul>
+    {list.map((item) => (
+      <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
+    ))}
+  </ul>
+);
+
+const Item = ({ item, onRemoveItem }) => (
+  <li>
+    <span>
+      <a href={item.url}>{item.title}</a>
+    </span>{' '}
+    <span>{item.author}</span>{' '}
+    <span>{item.num_comments}</span>{' '}
+    <span>{item.points}</span>{' '}
+    <span>
+      <button type="button" onClick={() => onRemoveItem(item)}>
+        Dismiss
+      </button>
+    </span>
+  </li>
+);
+
+const InputWithLabel = ({ id, value, type = 'text', onInputChange, children }) => (
+  <>
+    <label htmlFor={id}>{children}</label>
+    <input id={id} type={type} value={value} onChange={onInputChange} />
+  </>
+);
 
 const App = () => {
-  console.log("App renders")
-
-  const stories = [
+  const initialStories = [
     {
-      title: "React",
-      url: "https://reactjs.org/",
-      author: "Jordan Walke",
+      title: 'React',
+      url: 'https://reactjs.org',
+      author: 'Jordan Walke',
       num_comments: 3,
       points: 4,
       objectID: 0,
     },
     {
-      title: "Redux",
-      url: "https://redux.js.org/",
-      author: "Dan Abramov, Andrew Clark",
+      title: 'Redux',
+      url: 'https://redux.js.org',
+      author: 'Dan Abramov',
       num_comments: 2,
       points: 5,
       objectID: 1,
     },
-  ]
+  ];
 
-  const getStoredSearchTerm = () =>
-    localStorage.getItem('search') || ''
-
-  const [searchTerm, setSearchTerm] = useState(getStoredSearchTerm)
-
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value)
-    console.log("Search Term:", event.target.value)
-  }
+  const [stories, setStories] = useState(initialStories);
+  const [searchTerm, setSearchTerm] = useState(localStorage.getItem('search') || '');
 
   useEffect(() => {
-    localStorage.setItem('search', searchTerm)
-  }, [searchTerm])
+    localStorage.setItem('search', searchTerm);
+  }, [searchTerm]);
 
-  const filteredStories = stories.filter((story) =>
+  const handleRemoveStory = (item) => {
+    const newStories = stories.filter(
+      (story) => item.objectID !== story.objectID
+    );
+    setStories(newStories);
+  };
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const searchedStories = stories.filter((story) =>
     story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  return (
-    <>
-      <div>
-        <h1>Hello World</h1>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-
-      <h1>Vite + React</h1>
-
-      <div className="card">
-        <button onClick={() => setSearchTerm("")}>
-          Reset Search
-        </button>
-      </div>
-
-      <Search searchTerm={searchTerm} onSearch={handleSearch} />
-      <p>Searching for: {searchTerm}</p>
-      <List list={filteredStories} />
-    </>
-  )
-}
-
-const Search = ({ searchTerm, onSearch }) => {
-  console.log("Search renders")
-
-  return (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <label htmlFor="search">Search: </label>
-      <input
-        id="search"
-        type="text"
-        value={searchTerm}
-        onChange={onSearch}
-      />
-    </form>
-  )
-}
-
-const List = ({ list }) => {
-  console.log("List renders")
+  );
 
   return (
     <div>
-      <p>This is my list:</p>
-      <ul>
-        {list.map(({ objectID, ...item }) => (
-          <Item key={objectID} item={item} />
-        ))}
-      </ul>
+      <h1>My Hacker Stories</h1>
+      <InputWithLabel
+        id="search"
+        value={searchTerm}
+        onInputChange={handleSearch}
+      >
+        <strong>Search: </strong>
+      </InputWithLabel>
+      <hr />
+      <List list={searchedStories} onRemoveItem={handleRemoveStory} />
     </div>
-  )
-}
+  );
+};
 
-const Item = ({ item }) => {
-  console.log("Item renders")
-  const { title, url, author, num_comments, points } = item
-
-  return (
-    <li>
-      <a href={url}>{title}</a> — the author is {author}, comments: {num_comments}, points: {points}
-    </li>
-  )
-}
-
-export default App
+export default App;
